@@ -11,6 +11,7 @@ const UserSchema = Schema({
   username: {
     type: String,
     required: true,
+    unique: true,
     lowercase: true
   },
   password: {
@@ -24,7 +25,7 @@ UserSchema.pre('save', function(next) {
   // Fill this middleware in with the Proper password encrypting, bcrypt.hash()
   // if there is an error here you'll need to handle it by calling next(err);
   // Once the password is encrypted, call next() so that your userController and create a user
-  return bcrypt
+  bcrypt
     .hash(this.password, 10)
     .then(hash => {
       this.password = hash;
@@ -41,7 +42,21 @@ UserSchema.methods.checkPassword = function(plainTextPW, callBack) {
   // Fill this method in with the Proper password comparing, bcrypt.compare()
   // Your controller will be responsible for sending the information here for password comparison
   // Once you have the user, you'll need to pass the encrypted pw and the plaintext pw to the compare function
-  return bcrypt.compare(myPlaintextPassword, this.password);
+  bcrypt.compare(plainTextPW, this.password, (err, res)=>{
+    return callBack(err, res)
+  })
 };
+
+// bcrypt.compare(plainTextPW, this.password, (err, res) => {
+//     if(res = true){
+//       return this.password
+//     } else {
+//       console.log(err)
+//       return false
+//     }
+//   });
+//};
+
+
 
 module.exports = mongoose.model('User', UserSchema);

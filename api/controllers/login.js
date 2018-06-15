@@ -4,8 +4,10 @@ const User = require('../models/userModels');
 
 const login = (req, res) => {
   const { username, password } = req.body;
+  console.log({username, password})
   User.findOne({ username }, (err, user) => {
     if (err) {
+      console.log('err')
       res.status(403).json({ error: 'Invalid Username/Password' });
       return;
     }
@@ -14,15 +16,15 @@ const login = (req, res) => {
       return;
     }
     user.checkPassword(password, (nonMatch, hashMatch) => {
+      console.log(hashMatch);
+
       // This is an example of using our User.method from our model.
-      if (nonMatch !== null) {
-        res.status(422).json({ error: 'passwords dont match' });
+      if (nonMatch) {
+        res.status(500).json({ error: 'bcrypt error' });
         return;
       }
       if (hashMatch) {
-        const payload = {
-          username: user.username
-        }; // what will determine our payload.
+        const payload = {username: user.username }; // what will determine our payload.
         const token = jwt.sign(payload, mysecret); // creates our JWT with a secret and a payload and a hash.
         res.json({ token }); // sends the token back to the client
       }
