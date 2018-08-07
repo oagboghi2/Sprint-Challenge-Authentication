@@ -26,14 +26,14 @@ UserSchema.pre('save', function(next) {
   // if there is an error here you'll need to handle it by calling next(err);
   // Once the password is encrypted, call next() so that your userController and create a user
   bcrypt
-    .hash(this.password, 10)
+    .hash(this.password, 10) // hash password in salt
     .then(hash => {
-      this.password = hash;
+      this.password = hash; // make hash password
 
-      return next();
+      return next(); // next() ends the middleware and moves onto to the next one
     })
     .catch(err => {
-      return next(err);
+      return next(err); // return an error
     })
 });
 
@@ -43,20 +43,10 @@ UserSchema.methods.checkPassword = function(plainTextPW, callBack) {
   // Your controller will be responsible for sending the information here for password comparison
   // Once you have the user, you'll need to pass the encrypted pw and the plaintext pw to the compare function
   bcrypt.compare(plainTextPW, this.password, (err, res)=>{
-    return callBack(err, res)
+    // compare plainTextPW with hash password
+    return callBack(err, res) //return the response object with my hashed password
   })
 };
-
-// bcrypt.compare(plainTextPW, this.password, (err, res) => {
-//     if(res = true){
-//       return this.password
-//     } else {
-//       console.log(err)
-//       return false
-//     }
-//   });
-//};
-
 
 
 module.exports = mongoose.model('User', UserSchema);
